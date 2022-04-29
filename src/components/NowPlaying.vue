@@ -306,7 +306,7 @@ export default {
       /**
        * Figure out the track adder.
        */
-      adder = ""
+      var adder = ""
       if (this.playlistData?.tracks?.items?.forEach != undefined) {
         this.playlistData?.tracks?.items?.forEach((item) => {
           if (item.track?.id === this.playerResponse.item?.id) {
