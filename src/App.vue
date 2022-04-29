@@ -43,13 +43,17 @@ export default {
         auth: 'https://accounts.spotify.com/authorize',
         token: 'https://accounts.spotify.com/api/token',
         base: 'https://api.spotify.com/v1',
-        nowPlaying: 'me/player/currently-playing'
+        nowPlaying: 'me/player/currently-playing',
+        playState: 'me/player',
+        playlistById: 'playlists/'
       },
       player: {
         playing: false,
         trackArtists: [],
         trackTitle: '',
-        trackAlbum: []
+        trackAlbum: [],
+        trackSource: '',
+        trackAdder: ''
       },
       storedId: ''
     }
