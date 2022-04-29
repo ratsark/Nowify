@@ -287,7 +287,11 @@ export default {
     handleNowPlaying() {
       if (
         this.playerResponse.error?.status === 401 ||
-        this.playerResponse.error?.status === 400
+        this.playerResponse.error?.status === 400 ||
+        this.playerStateResponse.error?.status === 401 ||
+        this.playerStateResponse.error?.status === 400 ||
+        this.playlistResponse.error?.status === 401 ||
+        this.playlistResponse.error?.status === 400
       ) {
         this.handleExpiredToken()
 
@@ -307,8 +311,8 @@ export default {
        * Figure out the track adder.
        */
       var adder = ""
-      if (this.playlistData?.tracks?.items?.forEach != undefined) {
-        this.playlistData?.tracks?.items?.forEach((item) => {
+      if (this.playlistResponse?.tracks?.items?.forEach != undefined) {
+        this.playlistResponse?.tracks?.items?.forEach((item) => {
           if (item.track?.id === this.playerResponse.item?.id) {
             adder = item.added_by?.id
           }
