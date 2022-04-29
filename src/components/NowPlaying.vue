@@ -15,6 +15,7 @@
       <div class="now-playing__details">
         <h1 class="now-playing__track" v-text="player.trackTitle"></h1>
         <h2 class="now-playing__artists" v-text="getTrackArtists"></h2>
+        <h2 class="now-playing__source" v-text="getTrackSource"></h2>
       </div>
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
@@ -41,6 +42,8 @@ export default {
     return {
       pollPlaying: '',
       playerResponse: {},
+      playerStateResponse: {},
+      playlistResponse: {},
       playerData: this.getEmptyPlayer(),
       colourPalette: '',
       swatches: []
@@ -54,6 +57,10 @@ export default {
      */
     getTrackArtists() {
       return this.player.trackArtists.join(', ')
+    },
+    
+    getTrackSource() {
+      return `${this.player.trackSource}/${this.player.trackAdder}`
     }
   },
 
@@ -105,8 +112,92 @@ export default {
           return
         }
 
-        data = await response.json()
-        this.playerResponse = data
+        const playerData = await response.json()
+        if (playerData.item?.id === this.playerData.trackId) {
+          return
+        }
+        
+        /**
+         * We've got a new track. Save the data and find its source.
+         */
+        const stateResponse = await fetch(
+          `${this.endpoints.base}/${this.endpoints.playState}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.auth.accessToken}`
+            }
+          }
+        )
+
+        /**
+         * Fetch error.
+         */
+        if (!stateResponse.ok) {
+          throw new Error(`An error has occured: ${stateResponse.status}`)
+        }
+
+        /**
+         * Spotify returns a 204 when no current device session is found.
+         * The connection was successful but there's no content to return.
+         */
+        if (stateResponse.status === 204) {
+          data = this.getEmptyPlayer()
+          this.playerData = data
+
+          this.$nextTick(() => {
+            this.$emit('spotifyTrackUpdated', data)
+          })
+
+          return
+        }
+
+        const stateData = await stateResponse.json()
+        if (stateData?.context?.type != "playlist" || stateData?.context?.href === undefined) {
+          this.playlistResponse = {}
+          this.playerStateResponse = stateData
+          this.playerResponse = playerData
+          return
+        }
+        
+                
+        /**
+         * We're listening to a playlist. Find out who added the current track.
+         */
+        const playlistResponse = await fetch(
+          stateData.context.href,
+          {
+            headers: {
+              Authorization: `Bearer ${this.auth.accessToken}`
+            }
+          }
+        )
+
+        /**
+         * Fetch error.
+         */
+        if (!playlistResponse.ok) {
+          throw new Error(`An error has occured: ${playlistResponse.status}`)
+        }
+
+        /**
+         * Spotify returns a 204 when no current device session is found.
+         * The connection was successful but there's no content to return.
+         */
+        if (playlistResponse.status === 204) {
+          data = this.getEmptyPlayer()
+          this.playerData = data
+
+          this.$nextTick(() => {
+            this.$emit('spotifyTrackUpdated', data)
+          })
+
+          return
+        }
+
+        const playlistData = await playlistResponse.json()
+        this.playlistResponse = playlistData
+        this.playerStateResponse = stateData
+        this.playerResponse = playerData
       } catch (error) {
         this.handleExpiredToken()
 
@@ -211,13 +302,17 @@ export default {
 
         return
       }
-
+      
       /**
-       * The newly fetched track is the same as our stored
-       * one, we don't want to update the DOM yet.
+       * Figure out the track adder.
        */
-      if (this.playerResponse.item?.id === this.playerData.trackId) {
-        return
+      adder = ""
+      if (this.playlistData?.tracks?.items?.forEach != undefined) {
+        this.playlistData?.tracks?.items?.forEach((item) => {
+          if (item.track?.id === this.playerResponse.item?.id) {
+            adder = item.added_by?.id
+          }
+        })
       }
 
       /**
@@ -233,7 +328,9 @@ export default {
         trackAlbum: {
           title: this.playerResponse.item.album.name,
           image: this.playerResponse.item.album.images[0].url
-        }
+        },
+        trackSource: this.playerStateResponse?.context?.type,
+        trackAdder: adder
       }
     },
 
