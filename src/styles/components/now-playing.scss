@@ -48,6 +48,7 @@
 
   &__artists {
     opacity: 0.8;
+    margin-bottom: 2.5%;
   }
 
   &--active {
@@ -68,11 +69,6 @@
     &__cover,
     &__details {
       width: 50%;
-      max-width: 495px;
-    }
-
-    &__details {
-      text-align: left;
     }
   }
 }
