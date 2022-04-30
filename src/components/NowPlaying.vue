@@ -120,6 +120,7 @@ export default {
         /**
          * We've got a new track. Save the data and find its source.
          */
+        this.playerResponse = playerData
         const stateResponse = await fetch(
           `${this.endpoints.base}/${this.endpoints.playState}`,
           {
@@ -143,6 +144,8 @@ export default {
         if (stateResponse.status === 204) {
           data = this.getEmptyPlayer()
           this.playerData = data
+          this.playlistResponse = {}
+          this.playerStateResponse = {}
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
@@ -152,10 +155,9 @@ export default {
         }
 
         const stateData = await stateResponse.json()
+        this.playerStateResponse = stateData
         if (stateData?.context?.type != "playlist" || stateData?.context?.href === undefined) {
           this.playlistResponse = {}
-          this.playerStateResponse = stateData
-          this.playerResponse = playerData
           return
         }
         
@@ -186,6 +188,7 @@ export default {
         if (playlistResponse.status === 204) {
           data = this.getEmptyPlayer()
           this.playerData = data
+          this.playlistResponse = {}
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
@@ -196,8 +199,6 @@ export default {
 
         const playlistData = await playlistResponse.json()
         this.playlistResponse = playlistData
-        this.playerStateResponse = stateData
-        this.playerResponse = playerData
       } catch (error) {
         this.handleExpiredToken()
 
