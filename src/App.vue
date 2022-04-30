@@ -45,7 +45,8 @@ export default {
         base: 'https://api.spotify.com/v1',
         nowPlaying: 'me/player/currently-playing',
         playState: 'me/player',
-        playlistById: 'playlists/'
+        playlistById: 'playlists',
+        userProfile: 'users'
       },
       player: {
         playing: false,
@@ -53,7 +54,8 @@ export default {
         trackTitle: '',
         trackAlbum: [],
         trackSource: '',
-        trackAdder: ''
+        trackAdder: '',
+        trackAdderPic: ''
       },
       storedId: ''
     }
