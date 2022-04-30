@@ -167,8 +167,8 @@ export default {
         /**
          * We're listening to a playlist. Find out who added the current track.
          */
-        playlistUrl = stateData.context.href
-        adderUrl = ""
+        let playlistUrl = stateData.context.href
+        let adderUrl = ""
         
         while (playlistUrl && !responses.addedBy) {
           const playlistResponse = await fetch(
