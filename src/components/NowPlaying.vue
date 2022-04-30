@@ -15,13 +15,13 @@
       <div class="now-playing__details">
         <h1 class="now-playing__track" v-text="player.trackTitle"></h1>
         <h2 class="now-playing__artists" v-text="getTrackArtists"></h2>
-        <h2 class="now-playing__source" v-text="getTrackSource"></h2>
         <img
           v-if="player.trackAdderPic"
           :src="player.trackAdderPic"
           :alt="player.trackAdder"
           class="now-playing__profilepic"
         />
+        <h2 class="now-playing__source" v-text="getTrackSource"></h2>
       </div>
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
