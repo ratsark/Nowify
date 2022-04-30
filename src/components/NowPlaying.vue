@@ -272,7 +272,7 @@ export default {
         }
 
         const userProfileData = await userProfileResponse.json()
-        this.userProfileResponse = playlistData
+        this.userProfileResponse = userProfileData
         this.addedByImage = userProfileData?.images?.url
         this.addedBy = userProfileData?.display_name
       } catch (error) {
