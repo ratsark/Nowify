@@ -194,7 +194,7 @@ export default {
            * Look for the track adder in an original playlist response or "extra tracks" response.
            */
           if (playlistData.tracks?.items?.forEach || playlistData.items?.forEach) {
-            (playlistData.tracks?.items?.forEach || playlistData.items?.forEach)((item) => {
+            (playlistData.tracks?.items || playlistData.items).forEach((item) => {
               if (item.track?.id === responses.playerResponse.item?.id) {
                 responses.addedBy = item.added_by?.id
                 adderUrl = item.added_by?.href
