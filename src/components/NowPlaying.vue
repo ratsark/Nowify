@@ -359,7 +359,8 @@ export default {
         },
         trackSource: this.responses.playerStateResponse?.context?.type,
         trackAdder: this.responses.userProfileResponse?.display_name || this.responses.addedBy,
-        trackAdderPic: (this.responses.userProfileResponse?.images ? this.responses.userProfileResponse?.images[0].url : "")
+        trackAdderPic: ((this.responses.userProfileResponse?.images && this.responses.userProfileResponse.images > 0) ?
+            this.responses.userProfileResponse?.images[0].url : "")
       }
     },
 
