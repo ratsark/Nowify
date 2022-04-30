@@ -390,6 +390,20 @@ export default {
     playerResponse: function() {
       this.handleNowPlaying()
     },
+    
+    /**
+     * Watch the returned player state object.
+     */
+    playerStateResponse: function() {
+      this.handleNowPlaying()
+    },
+    
+    /**
+     * Watch the returned playlist object.
+     */
+    playlistResponse: function() {
+      this.handleNowPlaying()
+    },
 
     /**
      * Watch our locally stored track data.
