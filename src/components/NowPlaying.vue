@@ -167,36 +167,40 @@ export default {
         /**
          * We're listening to a playlist. Find out who added the current track.
          */
-        const playlistResponse = await fetch(
-          stateData.context.href,
-          {
-            headers: {
-              Authorization: `Bearer ${this.auth.accessToken}`
-            }
-          }
-        )
-
-        /**
-         * Fetch error.
-         */
-        if (!playlistResponse.ok) {
-          throw new Error(`An error has occured: ${playlistResponse.status}`)
-        }
-
-        const playlistData = await playlistResponse.json()
-        responses.playlistResponse = playlistData
+        playlistUrl = stateData.context.href
+        adderUrl = ""
         
-        /**
-         * Figure out the track adder.
-         */
-        var adderUrl = ""
-        if (playlistData.tracks?.items?.forEach) {
-          playlistData.tracks?.items?.forEach((item) => {
-            if (item.track?.id === responses.playerResponse.item?.id) {
-              responses.addedBy = item.added_by?.id
-              adderUrl = item.added_by?.href
+        while (playlistUrl && !responses.addedBy) {
+          const playlistResponse = await fetch(
+            playlistUrl,
+            {
+              headers: {
+                Authorization: `Bearer ${this.auth.accessToken}`
+              }
             }
-          })
+          )
+
+          /**
+           * Fetch error.
+           */
+          if (!playlistResponse.ok) {
+            throw new Error(`An error has occured: ${playlistResponse.status}`)
+          }
+
+          const playlistData = await playlistResponse.json()
+          playlistUrl = playlistData.tracks?.next
+        
+          /**
+           * Look for the track adder.
+           */
+          if (playlistData.tracks?.items?.forEach) {
+            playlistData.tracks?.items?.forEach((item) => {
+              if (item.track?.id === responses.playerResponse.item?.id) {
+                responses.addedBy = item.added_by?.id
+                adderUrl = item.added_by?.href
+              }
+            })
+          }
         }
         if (!adderUrl) {
           return
@@ -225,6 +229,7 @@ export default {
         responses.userProfileResponse = userProfileData
         responses.addedByImage = userProfileData?.images?.url
       } catch (error) {
+        console.log(error)
         this.handleExpiredToken()
 
         data = this.getEmptyPlayer()
