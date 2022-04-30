@@ -468,6 +468,14 @@ export default {
     playlistResponse: function() {
       this.handleNowPlaying()
     },
+    
+        
+    /**
+     * Watch the returned user profile object.
+     */
+    userProfileResponse: function() {
+      this.handleNowPlaying()
+    },
 
     /**
      * Watch our locally stored track data.
