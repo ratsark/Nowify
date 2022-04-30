@@ -16,6 +16,12 @@
         <h1 class="now-playing__track" v-text="player.trackTitle"></h1>
         <h2 class="now-playing__artists" v-text="getTrackArtists"></h2>
         <h2 class="now-playing__source" v-text="getTrackSource"></h2>
+        <img
+          v-if="player.trackAdderPic"
+          :src="player.trackAdderPic"
+          :alt="player.trackAdder"
+          class="now-playing__profilepic"
+        />
       </div>
     </div>
     <div v-else class="now-playing" :class="getNowPlayingClass()">
@@ -44,6 +50,9 @@ export default {
       playerResponse: {},
       playerStateResponse: {},
       playlistResponse: {},
+      addedBy: '',
+      userProfileResponse: {},
+      addedByImage: '',
       playerData: this.getEmptyPlayer(),
       colourPalette: '',
       swatches: []
@@ -107,6 +116,10 @@ export default {
         if (response.status === 204) {
           data = this.getEmptyPlayer()
           this.playerData = data
+          this.playerResponse = {}
+          this.playlistResponse = {}
+          this.playerStateResponse = {}
+          this.userProfileResponse = {}
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
@@ -149,6 +162,7 @@ export default {
           this.playerData = data
           this.playlistResponse = {}
           this.playerStateResponse = {}
+          this.userProfileResponse = {}
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
@@ -192,6 +206,7 @@ export default {
           data = this.getEmptyPlayer()
           this.playerData = data
           this.playlistResponse = {}
+          this.userProfileResponse = {}
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
@@ -202,6 +217,63 @@ export default {
 
         const playlistData = await playlistResponse.json()
         this.playlistResponse = playlistData
+        
+        /**
+         * Figure out the track adder.
+         */
+        var adder = ""
+        var adderUrl = ""
+        if (this.playlistResponse?.tracks?.items?.forEach != undefined) {
+          this.playlistResponse?.tracks?.items?.forEach((item) => {
+            if (item.track?.id === this.playerResponse.item?.id) {
+              adder = item.added_by?.id
+              adderUrl = item.added_by?.href
+            }
+          })
+        }
+        this.addedBy = adder
+        if (!adderUrl) {
+          return
+        }
+        
+        /**
+         * Next, fetch the URL of the adding user's profile picture.
+         */
+        const userProfileResponse = await fetch(
+          adderUrl,
+          {
+            headers: {
+              Authorization: `Bearer ${this.auth.accessToken}`
+            }
+          }
+        )
+
+        /**
+         * Fetch error.
+         */
+        if (!userProfileResponse.ok) {
+          throw new Error(`An error has occured: ${userProfileResponse.status}`)
+        }
+
+        /**
+         * Spotify returns a 204 when no current device session is found.
+         * The connection was successful but there's no content to return.
+         */
+        if (userProfileResponse.status === 204) {
+          data = this.getEmptyPlayer()
+          this.playerData = data
+          this.userProfileResponse = {}
+
+          this.$nextTick(() => {
+            this.$emit('spotifyTrackUpdated', data)
+          })
+
+          return
+        }
+
+        const userProfileData = await userProfileResponse.json()
+        this.userProfileResponse = playlistData
+        this.addedByImage = userProfileData?.images?.url
       } catch (error) {
         this.handleExpiredToken()
 
@@ -310,18 +382,6 @@ export default {
 
         return
       }
-      
-      /**
-       * Figure out the track adder.
-       */
-      var adder = ""
-      if (this.playlistResponse?.tracks?.items?.forEach != undefined) {
-        this.playlistResponse?.tracks?.items?.forEach((item) => {
-          if (item.track?.id === this.playerResponse.item?.id) {
-            adder = item.added_by?.id
-          }
-        })
-      }
 
       /**
        * Store the current active track.
@@ -338,7 +398,8 @@ export default {
           image: this.playerResponse.item.album.images[0].url
         },
         trackSource: this.playerStateResponse?.context?.type,
-        trackAdder: adder
+        trackAdder: this.addedBy,
+        trackAdderPic: this.addedByImage
       }
     },
 
