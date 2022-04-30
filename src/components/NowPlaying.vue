@@ -60,7 +60,10 @@ export default {
     },
     
     getTrackSource() {
-      return `${this.player.trackSource}/${this.player.trackAdder}`
+      if (this.player.trackSource == "playlist") {
+        return `Added by ${this.player.trackAdder}`
+      }
+      return `Playing from ${this.player.trackSource}`
     }
   },
 
