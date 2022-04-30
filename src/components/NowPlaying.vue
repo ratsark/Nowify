@@ -47,12 +47,7 @@ export default {
   data() {
     return {
       pollPlaying: '',
-      playerResponse: {},
-      playerStateResponse: {},
-      playlistResponse: {},
-      addedBy: '',
-      userProfileResponse: {},
-      addedByImage: '',
+      responses: {},
       playerData: this.getEmptyPlayer(),
       colourPalette: '',
       swatches: []
@@ -91,6 +86,7 @@ export default {
      */
     async getNowPlaying() {
       let data = {}
+      let responses = {}
 
       try {
         const response = await fetch(
@@ -113,13 +109,12 @@ export default {
          * Spotify returns a 204 when no current device session is found.
          * The connection was successful but there's no content to return.
          */
+         
+        // TODO: integrate this into the watcher
         if (response.status === 204) {
           data = this.getEmptyPlayer()
           this.playerData = data
-          this.playerResponse = {}
-          this.playlistResponse = {}
-          this.playerStateResponse = {}
-          this.userProfileResponse = {}
+          responses = this.responses
 
           this.$nextTick(() => {
             this.$emit('spotifyTrackUpdated', data)
@@ -130,13 +125,14 @@ export default {
 
         const playerData = await response.json()
         if (playerData.item?.id === this.playerData.trackId) {
+          responses = this.responses
           return
         }
         
         /**
          * We've got a new track. Save the data and find its source.
          */
-        this.playerResponse = playerData
+        responses.playerResponse = playerData
         const stateResponse = await fetch(
           `${this.endpoints.base}/${this.endpoints.playState}`,
           {
@@ -158,23 +154,12 @@ export default {
          * The connection was successful but there's no content to return.
          */
         if (stateResponse.status === 204) {
-          data = this.getEmptyPlayer()
-          this.playerData = data
-          this.playlistResponse = {}
-          this.playerStateResponse = {}
-          this.userProfileResponse = {}
-
-          this.$nextTick(() => {
-            this.$emit('spotifyTrackUpdated', data)
-          })
-
           return
         }
 
         const stateData = await stateResponse.json()
-        this.playerStateResponse = stateData
+        responses.playerStateResponse = stateData
         if (stateData?.context?.type != "playlist" || stateData?.context?.href === undefined) {
-          this.playlistResponse = {}
           return
         }
         
@@ -198,40 +183,21 @@ export default {
           throw new Error(`An error has occured: ${playlistResponse.status}`)
         }
 
-        /**
-         * Spotify returns a 204 when no current device session is found.
-         * The connection was successful but there's no content to return.
-         */
-        if (playlistResponse.status === 204) {
-          data = this.getEmptyPlayer()
-          this.playerData = data
-          this.playlistResponse = {}
-          this.userProfileResponse = {}
-
-          this.$nextTick(() => {
-            this.$emit('spotifyTrackUpdated', data)
-          })
-
-          return
-        }
-
         const playlistData = await playlistResponse.json()
-        this.playlistResponse = playlistData
+        responses.playlistResponse = playlistData
         
         /**
          * Figure out the track adder.
          */
-        var adder = ""
         var adderUrl = ""
         if (this.playlistResponse?.tracks?.items?.forEach != undefined) {
           this.playlistResponse?.tracks?.items?.forEach((item) => {
             if (item.track?.id === this.playerResponse.item?.id) {
-              adder = item.added_by?.id
+              responses.addedBy = item.added_by?.id
               adderUrl = item.added_by?.href
             }
           })
         }
-        this.addedBy = adder
         if (!adderUrl) {
           return
         }
@@ -255,34 +221,21 @@ export default {
           throw new Error(`An error has occured: ${userProfileResponse.status}`)
         }
 
-        /**
-         * Spotify returns a 204 when no current device session is found.
-         * The connection was successful but there's no content to return.
-         */
-        if (userProfileResponse.status === 204) {
-          data = this.getEmptyPlayer()
-          this.playerData = data
-          this.userProfileResponse = {}
-
-          this.$nextTick(() => {
-            this.$emit('spotifyTrackUpdated', data)
-          })
-
-          return
-        }
-
         const userProfileData = await userProfileResponse.json()
-        this.userProfileResponse = userProfileData
-        this.addedByImage = userProfileData?.images?.url
+        responses.userProfileResponse = userProfileData
+        responses.addedByImage = userProfileData?.images?.url
       } catch (error) {
         this.handleExpiredToken()
 
         data = this.getEmptyPlayer()
         this.playerData = data
+        responses = this.responses
 
         this.$nextTick(() => {
           this.$emit('spotifyTrackUpdated', data)
         })
+      } finally {
+        this.responses = responses
       }
     },
 
@@ -362,12 +315,14 @@ export default {
      */
     handleNowPlaying() {
       if (
-        this.playerResponse.error?.status === 401 ||
-        this.playerResponse.error?.status === 400 ||
-        this.playerStateResponse.error?.status === 401 ||
-        this.playerStateResponse.error?.status === 400 ||
-        this.playlistResponse.error?.status === 401 ||
-        this.playlistResponse.error?.status === 400
+        this.playerResponse?.error?.status === 401 ||
+        this.playerResponse?.error?.status === 400 ||
+        this.playerStateResponse?.error?.status === 401 ||
+        this.playerStateResponse?.error?.status === 400 ||
+        this.playlistResponse?.error?.status === 401 ||
+        this.playlistResponse?.error?.status === 400 ||
+        this.userProfileResponse?.error?.status === 401 ||
+        this.userProfileResponse?.error?.status === 400
       ) {
         this.handleExpiredToken()
 
@@ -377,7 +332,7 @@ export default {
       /**
        * Player is active, but user has paused.
        */
-      if (this.playerResponse.is_playing === false) {
+      if (!this.responses.playerResponse?.is_playing) {
         this.playerData = this.getEmptyPlayer()
 
         return
@@ -387,19 +342,19 @@ export default {
        * Store the current active track.
        */
       this.playerData = {
-        playing: this.playerResponse.is_playing,
-        trackArtists: this.playerResponse.item.artists.map(
+        playing: this.responses.playerResponse.is_playing,
+        trackArtists: this.responses.playerResponse.item.artists.map(
           artist => artist.name
         ),
-        trackTitle: this.playerResponse.item.name,
-        trackId: this.playerResponse.item.id,
+        trackTitle: this.responses.playerResponse.item.name,
+        trackId: this.responses.playerResponse.item.id,
         trackAlbum: {
-          title: this.playerResponse.item.album.name,
-          image: this.playerResponse.item.album.images[0].url
+          title: this.responses.playerResponse.item.album.name,
+          image: this.responses.playerResponse.item.album.images[0].url
         },
-        trackSource: this.playerStateResponse?.context?.type,
-        trackAdder: this.userProfileResponse?.display_name || this.addedBy,
-        trackAdderPic: (this.userProfileResponse?.images ? this.userProfileResponse?.images[0].url : "")
+        trackSource: this.responses.playerStateResponse?.context?.type,
+        trackAdder: this.responses.userProfileResponse?.display_name || this.responses.addedBy,
+        trackAdderPic: (this.responses.userProfileResponse?.images ? this.responses.userProfileResponse?.images[0].url : "")
       }
     },
 
@@ -463,17 +418,9 @@ export default {
     },
     
     /**
-     * Watch the returned playlist object.
+     * Watch the responses object.
      */
-    playlistResponse: function() {
-      this.handleNowPlaying()
-    },
-    
-        
-    /**
-     * Watch the returned user profile object.
-     */
-    userProfileResponse: function() {
+    responses: function() {
       this.handleNowPlaying()
     },
 
