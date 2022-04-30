@@ -190,9 +190,9 @@ export default {
          * Figure out the track adder.
          */
         var adderUrl = ""
-        if (playlistData.tracks?.items?.forEach != undefined) {
+        if (playlistData.tracks?.items?.forEach) {
           playlistData.tracks?.items?.forEach((item) => {
-            if (item.track?.id === this.playerResponse.item?.id) {
+            if (item.track?.id === responses.playerResponse.item?.id) {
               responses.addedBy = item.added_by?.id
               adderUrl = item.added_by?.href
             }
