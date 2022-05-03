@@ -227,7 +227,6 @@ export default {
 
         const userProfileData = await userProfileResponse.json()
         responses.userProfileResponse = userProfileData
-        responses.addedByImage = userProfileData?.images?.url
       } catch (error) {
         console.log(error)
         this.handleExpiredToken()
@@ -359,7 +358,7 @@ export default {
         },
         trackSource: this.responses.playerStateResponse?.context?.type,
         trackAdder: this.responses.userProfileResponse?.display_name || this.responses.addedBy,
-        trackAdderPic: ((this.responses.userProfileResponse?.images && this.responses.userProfileResponse.images > 0) ?
+        trackAdderPic: ((this.responses.userProfileResponse?.images && this.responses.userProfileResponse.images.length > 0) ?
             this.responses.userProfileResponse?.images[0].url : "")
       }
     },
