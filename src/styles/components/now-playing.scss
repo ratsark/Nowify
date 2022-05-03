@@ -62,7 +62,7 @@
     justify-content: center;
   }
 
-  @media only screen and (max-aspect-ratio: .95) {
+  @media only screen and (max-aspect-ratio: 1/1) {
     flex-flow: row nowrap;
     padding: 10%;
 
