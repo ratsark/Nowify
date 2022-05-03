@@ -68,8 +68,7 @@
   }
   
   @media not screen and (min-aspect-ratio: 1/1) {
-    &__cover,
-    &__details {
+    &__cover {
       height: 50%;
     }
     
