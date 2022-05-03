@@ -188,7 +188,7 @@ export default {
           }
 
           const playlistData = await playlistResponse.json()
-          playlistUrl = playlistData.tracks?.next
+          playlistUrl = (playlistData.tracks || playlistData).next
         
           /**
            * Look for the track adder in an original playlist response or "extra tracks" response.
