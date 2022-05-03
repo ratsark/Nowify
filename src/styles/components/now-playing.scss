@@ -60,11 +60,17 @@
 
   @media only screen and (min-aspect-ratio: 1/1) {
     flex-flow: row nowrap;
-    padding: 10%;
 
     &__cover,
     &__details {
       width: 50%;
+    }
+  }
+  
+  @media not screen and (min-aspect-ratio: 1/1) {
+    &__cover,
+    &__details {
+      height: 50%;
     }
   }
 }
