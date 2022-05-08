@@ -109,17 +109,7 @@ export default {
          * Spotify returns a 204 when no current device session is found.
          * The connection was successful but there's no content to return.
          */
-         
-        // TODO: integrate this into the watcher
         if (response.status === 204) {
-          data = this.getEmptyPlayer()
-          this.playerData = data
-          responses = this.responses
-
-          this.$nextTick(() => {
-            this.$emit('spotifyTrackUpdated', data)
-          })
-
           return
         }
 
@@ -130,7 +120,7 @@ export default {
         if (playerData.item?.id === this.playerData.trackId && playerData.is_playing === this.playerData?.playing) {
           responses = this.responses
           return
-        } else if (playerData.is_playing !== this.playerData.playing) {
+        } else if (playerData.item?.id === this.playerData.trackId) {
           return
         }
         
