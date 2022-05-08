@@ -335,11 +335,11 @@ export default {
         
         document.documentElement.style.setProperty(
           '--color-text-primary',
-          #000
+          'black'
         )
         document.documentElement.style.setProperty(
           '--colour-background-now-playing',
-          #000
+          'black'
         )
 
         return
