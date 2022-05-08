@@ -101,9 +101,9 @@ export default {
         /**
          * Fetch error.
          */
-        if (!response.ok) {
-          throw new Error(`An error has occured: ${response.status}`)
-        }
+        //if (!response.ok) {
+        //  throw new Error(`An error has occured: ${response.status}`)
+        //}
 
         /**
          * Spotify returns a 204 when no current device session is found.
