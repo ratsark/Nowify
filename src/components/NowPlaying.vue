@@ -120,7 +120,7 @@ export default {
         if (playerData.item?.id === this.playerData.trackId && playerData.is_playing === this.playerData?.playing) {
           responses = this.responses
           return
-        } else if (playerData.item?.id === this.playerData.trackId) {
+        } else if (playerData.item?.id === this.playerData.trackId || !response.ok) {
           return
         }
         
