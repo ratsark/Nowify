@@ -124,15 +124,19 @@ export default {
         }
 
         const playerData = await response.json()
-        if (playerData.item?.id === this.playerData.trackId) {
+        responses.playerResponse = playerData
+        
+        // If nothing has changed, don't update
+        if (playerData.item?.id === this.playerData.trackId && playerData.is_playing === this.playerData?.playing) {
           responses = this.responses
+          return
+        } else if (playerData.is_playing !== this.playerData.playing) {
           return
         }
         
         /**
          * We've got a new track. Save the data and find its source.
          */
-        responses.playerResponse = playerData
         const stateResponse = await fetch(
           `${this.endpoints.base}/${this.endpoints.playState}`,
           {
