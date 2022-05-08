@@ -229,11 +229,11 @@ export default {
         responses.userProfileResponse = userProfileData
       } catch (error) {
         console.log(error)
-        this.handleExpiredToken()
+        //this.handleExpiredToken()
 
-        data = this.getEmptyPlayer()
-        this.playerData = data
-        responses = this.responses
+        //data = this.getEmptyPlayer()
+        //this.playerData = data
+        //responses = this.responses
 
         this.$nextTick(() => {
           this.$emit('spotifyTrackUpdated', data)
