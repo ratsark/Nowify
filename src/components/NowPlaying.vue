@@ -435,7 +435,7 @@ export default {
       this.$nextTick(() => {
         this.getAlbumColours()
       })
-    }
+    },
     
     /**
      * React immediately when the hash is manually changed.
