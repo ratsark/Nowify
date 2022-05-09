@@ -356,21 +356,31 @@ export default {
      */
     handleAlbumPalette(palette) {
       console.log(palette)
-      let albumColours = Object.keys(palette)
-        .filter(item => {
-          return item === null ? null : item
-        })
-        .map(colour => {
-          return {
-            text: palette[colour].getTitleTextColor(),
-            background: palette[colour].getHex()
-          }
-        })
 
-      this.swatches = albumColours
+      //let albumColours = Object.keys(palette)
+      //  .filter(item => {
+      //    return item === null ? null : item
+      //  })
+      //  .map(colour => {
+      //    return {
+      //      text: palette[colour].getTitleTextColor(),
+      //      background: palette[colour].getHex()
+      //    }
+      //  })
+     
+      //this.swatches = albumColours
 
-      this.colourPalette =
-        albumColours[Math.floor(Math.random() * albumColours.length)]
+      //this.colourPalette =
+      //  albumColours[Math.floor(Math.random() * albumColours.length)]
+      
+      chosenPalette = palette.Vibrant || palette.DarkVibrant || palette.LightVibrant || palette.Muted || palette.DarkMuted || palette.LightMuted
+      
+      console.log(chosenPalette)
+      
+      this.colourPalette = {
+        text: chosenPalette.getTitleTextColor(),
+        background: palette.getHex()
+      }
 
       this.$nextTick(() => {
         this.setAppColours()
