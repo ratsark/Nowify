@@ -355,6 +355,7 @@ export default {
      * - Get and store random colour combination.
      */
     handleAlbumPalette(palette) {
+      console.log(palette)
       let albumColours = Object.keys(palette)
         .filter(item => {
           return item === null ? null : item
