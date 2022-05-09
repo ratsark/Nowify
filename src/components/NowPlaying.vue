@@ -85,7 +85,6 @@ export default {
      * get the current played track.
      */
     async getNowPlaying() {
-      let data = {}
       let responses = {}
 
       try {
@@ -97,13 +96,6 @@ export default {
             }
           }
         )
-
-        /**
-         * Fetch error.
-         */
-        //if (!response.ok) {
-        //  throw new Error(`An error has occured: ${response.status}`)
-        //}
 
         /**
          * Spotify returns a 204 when no current device session is found.
@@ -223,15 +215,6 @@ export default {
         responses.userProfileResponse = userProfileData
       } catch (error) {
         console.log(error)
-        //this.handleExpiredToken()
-
-        //data = this.getEmptyPlayer()
-        //this.playerData = data
-        //responses = this.responses
-
-        //this.$nextTick(() => {
-        //  this.$emit('spotifyTrackUpdated', data)
-        //})
       } finally {
         this.responses = responses
       }
