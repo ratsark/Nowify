@@ -229,9 +229,9 @@ export default {
         //this.playerData = data
         //responses = this.responses
 
-        this.$nextTick(() => {
-          this.$emit('spotifyTrackUpdated', data)
-        })
+        //this.$nextTick(() => {
+        //  this.$emit('spotifyTrackUpdated', data)
+        //})
       } finally {
         this.responses = responses
       }
@@ -313,14 +313,14 @@ export default {
      */
     handleNowPlaying() {
       if (
-        this.playerResponse?.error?.status === 401 ||
-        this.playerResponse?.error?.status === 400 ||
-        this.playerStateResponse?.error?.status === 401 ||
-        this.playerStateResponse?.error?.status === 400 ||
-        this.playlistResponse?.error?.status === 401 ||
-        this.playlistResponse?.error?.status === 400 ||
-        this.userProfileResponse?.error?.status === 401 ||
-        this.userProfileResponse?.error?.status === 400
+        this.responses.playerResponse?.error?.status === 401 ||
+        this.responses.playerResponse?.error?.status === 400 ||
+        this.responses.playerStateResponse?.error?.status === 401 ||
+        this.responses.playerStateResponse?.error?.status === 400 ||
+        this.responses.playlistResponse?.error?.status === 401 ||
+        this.responses.playlistResponse?.error?.status === 400 ||
+        this.responses.userProfileResponse?.error?.status === 401 ||
+        this.responses.userProfileResponse?.error?.status === 400
       ) {
         this.handleExpiredToken()
 
