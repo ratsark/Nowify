@@ -379,7 +379,7 @@ export default {
       
       this.colourPalette = {
         text: chosenPalette.titleTextColor,
-        background: palette.hex
+        background: chosenPalette.hex
       }
 
       this.$nextTick(() => {
