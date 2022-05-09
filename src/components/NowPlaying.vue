@@ -440,7 +440,7 @@ export default {
     /**
      * React immediately when the hash is manually changed.
      */
-    $route(to, from) {
+    $route() {
       this.handleNowPlaying()
     }
   }
