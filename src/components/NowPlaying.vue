@@ -378,8 +378,8 @@ export default {
       console.log(chosenPalette)
       
       this.colourPalette = {
-        text: chosenPalette.getTitleTextColor(),
-        background: palette.getHex()
+        text: chosenPalette.titleTextColor,
+        background: palette.hex
       }
 
       this.$nextTick(() => {
