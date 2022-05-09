@@ -373,7 +373,7 @@ export default {
       //this.colourPalette =
       //  albumColours[Math.floor(Math.random() * albumColours.length)]
       
-      var chosenPalette = (window.location.hash ? window.location.hash.substring(1) : null) || palette.Vibrant || palette.DarkVibrant || palette.LightVibrant || palette.Muted || palette.DarkMuted || palette.LightMuted
+      var chosenPalette = (window.location.hash ? palette[window.location.hash.substring(1)] : null) || palette.Vibrant || palette.DarkVibrant || palette.LightVibrant || palette.Muted || palette.DarkMuted || palette.LightMuted
       
       console.log(chosenPalette)
       
