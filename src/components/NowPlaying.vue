@@ -436,6 +436,13 @@ export default {
         this.getAlbumColours()
       })
     }
+    
+    /**
+     * React immediately when the hash is manually changed.
+     */
+    $route(to, from) {
+      this.handleNowPlaying()
+    }
   }
 }
 </script>
